@@ -215,15 +215,15 @@ ${insight.policyRecommendations.map(r => `• [${r.targetAgency}] (${r.priority}
                     <AlertTriangle className="w-4 h-4 text-rose-400" />
                   </div>
                   <div className="text-2xl font-bold text-rose-400 tracking-tight">
-                    {insight.sentimentComparison.urgentCategoryNegativePct}%
+                    {insight.sentimentComparison?.urgentCategoryNegativePct ?? 0}%
                   </div>
                   <p className="text-[11px] text-gray-400 mt-1">
-                    Dari {insight.sentimentComparison.urgentCategoryCount} aspirasi pada sektor ini
+                    Dari {insight.sentimentComparison?.urgentCategoryCount ?? 0} aspirasi pada sektor ini
                   </p>
                 </div>
                 <div className="mt-2 text-[10px] text-rose-300/80 font-medium flex items-center gap-1">
                   <TrendingUp className="w-3 h-3" />
-                  <span>Tren {insight.sentimentComparison.trendDirection} dibanding pekan lalu</span>
+                  <span>Tren {insight.sentimentComparison?.trendDirection ?? 'Stabil'} dibanding pekan lalu</span>
                 </div>
               </div>
 
@@ -235,7 +235,7 @@ ${insight.policyRecommendations.map(r => `• [${r.targetAgency}] (${r.priority}
                     <MapPin className="w-4 h-4 text-blue-400" />
                   </div>
                   <div className="space-y-1 mt-1">
-                    {insight.affectedHotspots.slice(0, 2).map((loc, idx) => (
+                    {(insight.affectedHotspots || []).slice(0, 2).map((loc, idx) => (
                       <div key={idx} className="text-xs font-semibold text-white flex items-center gap-1.5 truncate">
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
                         <span className="truncate">{loc.replace('Kabupaten ', 'Kab. ')}</span>
@@ -256,10 +256,10 @@ ${insight.policyRecommendations.map(r => `• [${r.targetAgency}] (${r.priority}
                     <Layers className="w-4 h-4 text-blue-400" />
                   </div>
                   <div className="text-2xl font-bold text-white tracking-tight">
-                    {insight.sentimentComparison.totalPeriodAspirations}
+                    {insight.sentimentComparison?.totalPeriodAspirations ?? 0}
                   </div>
                   <p className="text-[11px] text-gray-400 mt-1">
-                    Masukan warga pada {insight.timeframeLabel.toLowerCase()}
+                    Masukan warga pada {(insight.timeframeLabel || '').toLowerCase()}
                   </p>
                 </div>
                 <div className="mt-2 text-[10px] text-blue-400 font-medium flex items-center gap-1">
@@ -310,7 +310,7 @@ ${insight.policyRecommendations.map(r => `• [${r.targetAgency}] (${r.priority}
                   </h4>
                 </div>
                 <div className="space-y-2.5">
-                  {insight.keyDrivers.map((driver, i) => (
+                  {(insight.keyDrivers || []).map((driver, i) => (
                     <div key={i} className="flex items-start gap-2.5 text-xs text-gray-300">
                       <div className="w-5 h-5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0 font-bold text-[10px] mt-0.5">
                         {i + 1}
@@ -337,7 +337,7 @@ ${insight.policyRecommendations.map(r => `• [${r.targetAgency}] (${r.priority}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {insight.policyRecommendations.map((rec, idx) => (
+                {(insight.policyRecommendations || []).map((rec, idx) => (
                   <div 
                     key={idx}
                     className="p-3.5 rounded-xl bg-[#1B1F2E] border border-[#293044] hover:border-blue-500/40 transition-all flex flex-col justify-between space-y-2"
@@ -365,7 +365,7 @@ ${insight.policyRecommendations.map(r => `• [${r.targetAgency}] (${r.priority}
             </div>
 
             {/* CITIZEN VOICE SPOTLIGHT (KUTIPAN KELUHAN WARGA TERKAIT) */}
-            {insight.sampleQuotes.length > 0 && (
+            {(insight.sampleQuotes || []).length > 0 && (
               <div className="p-5 rounded-xl bg-[#161924] border border-[#242A3B] space-y-3">
                 <div className="flex items-center gap-2 border-b border-[#242A3B] pb-2">
                   <MessageSquare className="w-4 h-4 text-gray-400" />
@@ -374,7 +374,7 @@ ${insight.policyRecommendations.map(r => `• [${r.targetAgency}] (${r.priority}
                   </h4>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {insight.sampleQuotes.map((quote, qIdx) => (
+                  {(insight.sampleQuotes || []).map((quote, qIdx) => (
                     <div 
                       key={qIdx}
                       className="p-3 rounded-xl bg-[#1A1D2A] border border-[#252A3C] text-xs space-y-2 flex flex-col justify-between"

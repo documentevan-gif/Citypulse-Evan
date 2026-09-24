@@ -16,7 +16,7 @@ import {
   ExternalLink, Calendar, User, ThumbsUp, 
   MinusCircle, AlertTriangle, ArrowRight, Share2, Upload,
   Map, ShieldCheck, Compass, Sun, Moon, Menu, X,
-  Trash2, BarChart3, Database
+  Trash2, BarChart3, Database, Lock
 } from 'lucide-react';
 import { CommentData, AnalysisSummary, Category, Sentiment } from './types';
 import { 
@@ -41,6 +41,7 @@ import { DeveloperProfileModal } from './components/DeveloperProfileModal';
 import { AiWeeklyInsightCard } from './components/AiWeeklyInsightCard';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { RegionalFilterBar } from './components/RegionalFilterBar';
+import { SecurityCodeModal, ProtectedActionType, AUTH_PASSCODE } from './components/SecurityCodeModal';
 
 // Standardized color palette for consistent sentiment and categories
 const SENTIMENT_COLORS = {
@@ -100,6 +101,14 @@ function AppDashboard() {
   // Feature 2: Aspiration Form Modal State
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [formDefaultRegion, setFormDefaultRegion] = useState<string | null>(null);
+
+  // Security Verification Modal for Protected Features (Code: EvanGantenk6f045)
+  // Protected features: Impor CSV, Ekspor Data, Kosongkan Data
+  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
+  const [securityAction, setSecurityAction] = useState<ProtectedActionType | null>(null);
+  const [pendingCsvFile, setPendingCsvFile] = useState<File | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const isImportAuthorizedRef = React.useRef<boolean>(false);
 
   // Load persistent dataset on initial mount
   useEffect(() => {
@@ -227,63 +236,62 @@ function AppDashboard() {
     setTimeout(() => setSuccessToast(null), 5000);
   };
 
-  // Clear all data for live citizen trial in Central Kalimantan
-  const handleClearAllData = () => {
-    if (window.confirm('Hapus seluruh data aspirasi?\n\nTindakan ini akan mengosongkan seluruh data aspirasi warga untuk memulai sesi uji coba lapangan langsung (trial & error) kepada masyarakat di Kalimantan Tengah.')) {
-      const empty = clearAllStoredComments();
-      setData(empty);
-      setSuccessToast('Semua data aspirasi telah dikosongkan. Platform siap untuk uji coba langsung ke masyarakat Kalimantan Tengah!');
-      setTimeout(() => setSuccessToast(null), 5000);
+  // Trigger protected actions (Requires Passcode: EvanGantenk6f045)
+  const handleRequestImport = () => {
+    setPendingCsvFile(null);
+    setSecurityAction('import_csv');
+    setIsSecurityModalOpen(true);
+  };
+
+  const handleRequestExport = () => {
+    if (filteredData.length === 0) {
+      setSuccessToast('Tidak ada data aspirasi untuk diekspor.');
+      setTimeout(() => setSuccessToast(null), 4000);
+      return;
     }
+    setSecurityAction('export_data');
+    setIsSecurityModalOpen(true);
+  };
+
+  const handleRequestClearAll = () => {
+    setSecurityAction('clear_data');
+    setIsSecurityModalOpen(true);
   };
 
   // Optional: Load sample demo dataset for previewing visualizations
   const handleLoadDemoData = () => {
-    if (window.confirm('Muat contoh dataset simulasi demo?\n\nIni akan memuat sampel data aspirasi di 14 kabupaten/kota Kalimantan Tengah untuk keperluan presentasi visual.')) {
-      const demo = loadDemoSampleData();
-      setData(demo);
-      setSelectedRegions([...KALTENG_REGIONS]);
-      setSuccessToast('Dataset contoh simulasi berhasil dimuat.');
-      setTimeout(() => setSuccessToast(null), 4000);
-    }
+    const demo = loadDemoSampleData();
+    setData(demo);
+    setSelectedRegions([...KALTENG_REGIONS]);
+    setSuccessToast('Dataset contoh simulasi berhasil dimuat.');
+    setTimeout(() => setSuccessToast(null), 4000);
   };
 
-  // Backward-compatible alias
-  const handleResetData = handleClearAllData;
+  // Backward-compatible aliases
+  const handleResetData = handleRequestClearAll;
+  const handleClearAllData = handleRequestClearAll;
+  const handleExportData = handleRequestExport;
 
-  // Export filtered dataset to JSON
-  const handleExportData = () => {
-    if (filteredData.length === 0) {
-      alert('Tidak ada data aspirasi untuk diekspor.');
-      return;
-    }
-    const blob = new Blob([JSON.stringify(filteredData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `aspirasi_warga_kalteng_${selectedRegions.length}_wilayah.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
-
-  // CSV Import with data cleaning
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  // Process CSV File with schema validation & Central Kalimantan region standardization
+  const processCsvFile = (file: File) => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
         const parsed = results.data as any[];
-        if (parsed.length === 0) return;
+        if (parsed.length === 0) {
+          setSuccessToast('Berkas CSV kosong.');
+          setTimeout(() => setSuccessToast(null), 4000);
+          return;
+        }
 
         const first = parsed[0];
         const colKomentar = Object.keys(first).find(k => /komentar|comment|teks|aspirasi/i.test(k));
         const colWilayah = Object.keys(first).find(k => /wilayah|region|kabupaten|kota/i.test(k));
 
         if (!colKomentar || !colWilayah) {
-          alert('Format berkas wajib memiliki kolom "komentar" dan "wilayah"!');
+          setSuccessToast('Format berkas wajib memiliki kolom "komentar" dan "wilayah"!');
+          setTimeout(() => setSuccessToast(null), 5000);
           return;
         }
 
@@ -330,9 +338,58 @@ function AppDashboard() {
           setDroppedRowsCount(dropped);
           setSuccessToast(`${validRows.length} aspirasi baru berhasil diimpor dari CSV.`);
           setTimeout(() => setSuccessToast(null), 5000);
+        } else {
+          setSuccessToast('Tidak ada data valid yang dapat diimpor untuk wilayah Kalimantan Tengah.');
+          setTimeout(() => setSuccessToast(null), 5000);
         }
       }
     });
+  };
+
+  // CSV File Input Handler: intercepts and guarantees passcode verification
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (isImportAuthorizedRef.current) {
+      isImportAuthorizedRef.current = false;
+      processCsvFile(file);
+    } else {
+      setPendingCsvFile(file);
+      setSecurityAction('import_csv');
+      setIsSecurityModalOpen(true);
+    }
+    e.target.value = '';
+  };
+
+  // Callback executed ONLY when correct code (EvanGantenk6f045) is entered
+  const handleSecuritySuccess = () => {
+    if (securityAction === 'clear_data') {
+      const empty = clearAllStoredComments();
+      setData(empty);
+      setSuccessToast('Semua data aspirasi telah dikosongkan. Platform siap untuk uji coba langsung ke masyarakat Kalimantan Tengah!');
+      setTimeout(() => setSuccessToast(null), 5000);
+    } else if (securityAction === 'export_data') {
+      const blob = new Blob([JSON.stringify(filteredData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `aspirasi_warga_kalteng_${selectedRegions.length}_wilayah.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setSuccessToast(`Data ${filteredData.length} aspirasi warga berhasil diekspor.`);
+      setTimeout(() => setSuccessToast(null), 4000);
+    } else if (securityAction === 'import_csv') {
+      if (pendingCsvFile) {
+        processCsvFile(pendingCsvFile);
+        setPendingCsvFile(null);
+      } else {
+        isImportAuthorizedRef.current = true;
+        setTimeout(() => {
+          fileInputRef.current?.click();
+        }, 100);
+      }
+    }
   };
 
   // Chart datasets
@@ -481,6 +538,57 @@ function AppDashboard() {
                 </span>
               </button>
             </nav>
+
+            {/* Mobile Data Management (Protected by Passcode: EvanGantenk6f045) */}
+            <div className={`p-3 rounded-xl border space-y-2 text-xs ${
+              isDark ? 'bg-[#181C28] border-[#242A3B]' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between">
+                <span>Manajemen Data</span>
+                <span className="flex items-center gap-1 text-amber-500 text-[10px] font-semibold">
+                  <Lock className="w-2.5 h-2.5" /> Dilindungi Kode
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleRequestImport();
+                  }}
+                  className={`p-2 rounded-lg border text-center flex flex-col items-center gap-1 font-semibold text-[11px] transition-all ${
+                    isDark ? 'bg-[#1F2433] border-[#2E364C] text-blue-400 hover:bg-[#282F42]' : 'bg-white border-slate-200 text-blue-600 hover:bg-slate-100 shadow-2xs'
+                  }`}
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Impor</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleRequestExport();
+                  }}
+                  disabled={filteredData.length === 0}
+                  className={`p-2 rounded-lg border text-center flex flex-col items-center gap-1 font-semibold text-[11px] transition-all disabled:opacity-40 ${
+                    isDark ? 'bg-[#1F2433] border-[#2E364C] text-emerald-400 hover:bg-[#282F42]' : 'bg-white border-slate-200 text-emerald-600 hover:bg-slate-100 shadow-2xs'
+                  }`}
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Ekspor</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleRequestClearAll();
+                  }}
+                  className={`p-2 rounded-lg border text-center flex flex-col items-center gap-1 font-semibold text-[11px] transition-all ${
+                    isDark ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20' : 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100 shadow-2xs'
+                  }`}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Kosongkan</span>
+                </button>
+              </div>
+            </div>
 
             {/* Mobile Theme Toggle */}
             <div className={`p-3 rounded-xl border flex items-center justify-between ${
@@ -777,42 +885,57 @@ function AppDashboard() {
               <span>Tulis Aspirasi</span>
             </button>
 
-            <label className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
-              isDark 
-                ? 'bg-[#1A1D27] border-[#242A3B] text-gray-300 hover:bg-[#232736] hover:text-white' 
-                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm'
-            }`}>
+            {/* Impor CSV - Dilindungi Kode Otorisasi */}
+            <button
+              onClick={handleRequestImport}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
+                isDark 
+                  ? 'bg-[#1A1D27] border-[#242A3B] text-gray-300 hover:bg-[#232736] hover:text-white' 
+                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm'
+              }`}
+              title="Impor Berkas CSV (Memerlukan Kode Otorisasi EvanGantenk6f045)"
+            >
               <Upload className="w-3.5 h-3.5 text-blue-500" />
               <span className="hidden sm:inline">Impor CSV</span>
-              <input type="file" accept=".csv" className="hidden" onChange={handleFileUpload} />
-            </label>
+              <Lock className="w-2.5 h-2.5 text-amber-500" />
+            </button>
+            <input 
+              ref={fileInputRef} 
+              type="file" 
+              accept=".csv" 
+              className="hidden" 
+              onChange={handleFileUpload} 
+            />
 
+            {/* Ekspor Data - Dilindungi Kode Otorisasi */}
             <button
-              onClick={handleExportData}
+              onClick={handleRequestExport}
               disabled={filteredData.length === 0}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
                 isDark 
                   ? 'bg-[#1A1D27] border-[#242A3B] text-gray-300 hover:bg-[#232736] hover:text-white' 
                   : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm'
               }`}
-              title="Unduh data terfilter dalam format JSON"
+              title="Unduh data terfilter (Memerlukan Kode Otorisasi EvanGantenk6f045)"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-emerald-500" />
               <span className="hidden sm:inline">Ekspor Data</span>
+              <Lock className="w-2.5 h-2.5 text-amber-500" />
             </button>
 
-            {/* Clear all data button */}
+            {/* Clear all data button - Dilindungi Kode Otorisasi */}
             <button
-              onClick={handleClearAllData}
-              title="Kosongkan semua data aspirasi (Mulai uji coba lapangan baru)"
+              onClick={handleRequestClearAll}
+              title="Kosongkan semua data aspirasi (Memerlukan Kode Otorisasi EvanGantenk6f045)"
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-all ${
                 isDark 
                   ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300' 
                   : 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
               }`}
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3.5 h-3.5 text-rose-500" />
               <span className="hidden sm:inline">Kosongkan Data</span>
+              <Lock className="w-2.5 h-2.5 text-rose-400" />
             </button>
 
             {/* Load demo dataset button if empty */}
@@ -1026,7 +1149,7 @@ function AppDashboard() {
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold ${
                       isDark ? 'bg-blue-500/10 border border-blue-500/25 text-blue-400' : 'bg-blue-50 border border-blue-200 text-blue-700'
                     }`}>
-                      <span>í ½í²¡ Klik bar wilayah untuk rincian (Drill-Down)</span>
+                      <span>ï¿½ï¿½ Klik bar wilayah untuk rincian (Drill-Down)</span>
                     </div>
                   </div>
 
@@ -1577,6 +1700,20 @@ function AppDashboard() {
       <DeveloperProfileModal
         isOpen={isDeveloperModalOpen}
         onClose={() => setIsDeveloperModalOpen(false)}
+      />
+
+      {/* FITUR 4: MODAL OTORISASI AKSES KHUSUS (KODE: EvanGantenk6f045) */}
+      <SecurityCodeModal
+        isOpen={isSecurityModalOpen}
+        actionType={securityAction}
+        onClose={() => {
+          setIsSecurityModalOpen(false);
+          setSecurityAction(null);
+          setPendingCsvFile(null);
+        }}
+        onSuccess={handleSecuritySuccess}
+        isDark={isDark}
+        pendingFileName={pendingCsvFile?.name}
       />
     </div>
   );

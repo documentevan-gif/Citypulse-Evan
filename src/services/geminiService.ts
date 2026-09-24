@@ -170,17 +170,17 @@ export async function generateWeeklyAiInsight(
         'Hasil survei lapangan atau kuesioner dapat diimpor langsung melalui format CSV'
       ],
       affectedHotspots: ['13 Kabupaten & 1 Kota Kalimantan Tengah'],
-      recentQuotes: [],
+      sampleQuotes: [],
       policyRecommendations: [
         { targetAgency: 'Bappeda & Perencana Wilayah', action: 'Buka kanal partisipasi publik dan lakukan sosialisasi pengisian aspirasi warga di kecamatan/kelurahan', priority: 'Segera' },
         { targetAgency: 'Diskominfo Kalteng', action: 'Sosialisasikan portal CityPulse Kalteng kepada komunitas masyarakat dan pemuda daerah', priority: 'Segera' }
       ],
-      trendDirection: 'Stabil',
-      totalAspirationsAnalyzed: 0,
-      negativeCount: 0,
-      positiveCount: 0,
-      neutralCount: 0,
-      negativePercentage: 0
+      sentimentComparison: {
+        urgentCategoryNegativePct: 0,
+        trendDirection: 'Stabil',
+        totalPeriodAspirations: 0,
+        urgentCategoryCount: 0
+      }
     };
   }
 
