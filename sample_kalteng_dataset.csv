@@ -1,0 +1,21 @@
+id,tanggal,wilayah,wilayah_terkoneksi,kategori,sentimen,komentar
+KALTENG-0001,2026-03-01,Kota Palangka Raya,Kabupaten Pulang Pisau,Transportasi,Positif,Apresiasi pelebaran jalan Trans Kalimantan rute Palangka Raya - Pulang Pisau yang semakin mulus dan memangkas waktu tempuh.
+KALTENG-0002,2026-03-02,Kabupaten Kotawaringin Timur,Kabupaten Seruyan,Transportasi,Negatif,Akses jalan truk CPO dari Seruyan menuju Pelabuhan Bagendang Sampit banyak berlubang dan rawan ambles saat hujan lebat.
+KALTENG-0003,2026-03-03,Kota Palangka Raya,Kabupaten Katingan,Ruang Terbuka Hijau,Positif,Taman Pasuk Kameloh dan kawasan Bundaran Besar Palangka Raya sangat representatif sebagai ruang terbuka hijau masyarakat.
+KALTENG-0004,2026-03-04,Kabupaten Barito Utara,Kabupaten Murung Raya,Transportasi,Negatif,Jalur transportasi darat Muara Teweh ke Puruk Cahu butuh perbaikan marka jalan dan tebing penahan longsor.
+KALTENG-0005,2026-03-05,Kabupaten Kotawaringin Barat,Kabupaten Lamandau,Sampah,Negatif,Timbunan sampah di tepi jalan lintas perbatasan Pangkalan Bun dan Nanga Bulik perlu segera dibersihkan oleh dinas terkait.
+KALTENG-0006,2026-03-06,Kabupaten Kapuas,Kabupaten Pulang Pisau,Ruang Terbuka Hijau,Positif,Pengembangan kawasan RTH bantaran sungai di Kuala Kapuas menambah kenyamanan warga berolahraga di sore hari.
+KALTENG-0007,2026-03-07,Kabupaten Gunung Mas,Kota Palangka Raya,Transportasi,Negatif,Truk angkutan batu bara dan kayu logistik yang melintas di jalan Kuala Kurun - Palangka Raya merusak aspal dan membahayakan warga.
+KALTENG-0008,2026-03-08,Kabupaten Katingan,Kabupaten Kotawaringin Timur,Transportasi,Netral,Jembatan Kasongan perlu pemeriksaan berkala mengingat intensitas tonase kendaraan berat lintas Sampit - Kasongan sangat padat.
+KALTENG-0009,2026-03-09,Kabupaten Barito Selatan,Kabupaten Barito Timur,Sampah,Negatif,TPS liar di sekitar pasar Buntok mengganggu drainase dan menimbulkan bau tidak sedap ke pemukiman sekitar.
+KALTENG-0010,2026-03-10,Kabupaten Lamandau,Kabupaten Sukamara,Transportasi,Positif,Peningkatan konektivitas jalan penghubung Lamandau ke Sukamara mempermudah distribusi hasil perkebunan dan sembako.
+KALTENG-0011,2026-03-11,Kabupaten Sukamara,Kabupaten Kotawaringin Barat,Ruang Terbuka Hijau,Positif,Penataan taman pantai dan ruang terbuka hijau di pesisir Sukamara meningkatkan potensi wisata keluarga.
+KALTENG-0012,2026-03-12,Kabupaten Murung Raya,Kabupaten Barito Utara,Lainnya,Netral,Layanan internet serat optik di pusat Puruk Cahu sudah baik namun masih terbatas di kecamatan pedalaman.
+KALTENG-0013,2026-03-13,Kabupaten Barito Timur,Kabupaten Barito Selatan,Transportasi,Negatif,Jalan penghubung Tamiang Layang menuju Buntok licin saat musim penghujan akibat tumpahan material tanah.
+KALTENG-0014,2026-03-14,Kabupaten Seruyan,Kabupaten Kotawaringin Timur,Sampah,Negatif,Perlu penyediaan bak sampah terpilah dan sosialisasi di Kuala Pembuang agar sampah plastik tidak mencemari Danau Sembuluh.
+KALTENG-0015,2026-03-15,Kota Palangka Raya,Kabupaten Gunung Mas,Ruang Terbuka Hijau,Positif,Ruang terbuka hijau di kawasan Taman Nyahu Simpei dan Hutan Kota Sabangau sangat asri dan terjaga ekosistemnya.
+KALTENG-0016,2026-03-16,Kabupaten Kapuas,Kabupaten Barito Selatan,Transportasi,Positif,Layanan kapal ferry penyeberangan sungai Barito sangat membantu konektivitas warga Kapuas menuju Barito Selatan.
+KALTENG-0017,2026-03-17,Kabupaten Kotawaringin Barat,Kabupaten Sukamara,Transportasi,Positif,Bandara Iskandar Pangkalan Bun semakin nyaman dan akses jalan lingkar luar kota tertata rapi.
+KALTENG-0018,2026-03-18,Kabupaten Pulang Pisau,Kota Palangka Raya,Sampah,Positif,Pengelolaan bank sampah di Pulang Pisau mampu mendaur ulang sampah plastik menjadi paving block bernilai ekonomi.
+KALTENG-0019,2026-03-19,Kabupaten Gunung Mas,Kabupaten Katingan,Transportasi,Negatif,Jalur alternatif lintas kabupaten di daerah hulu masih berupa tanah merah dan sulit dilalui kendaraan roda dua.
+KALTENG-0020,2026-03-20,Kabupaten Kotawaringin Timur,Kabupaten Katingan,Sampah,Negatif,Pusat pembuangan akhir di Sampit perluasan kapasitas agar tidak menimbulkan polusi ke daerah resapan air.
