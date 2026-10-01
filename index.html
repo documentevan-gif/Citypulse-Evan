@@ -3,11 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CivicPulse Kalteng - Platform Intelijen Aspirasi & Spasial Warga (Inisiator: Evan)</title>
+    <title>CityPulse Kalteng - Aspirasi Warga</title>
     <meta name="author" content="Evan" />
     <meta name="description" content="Platform penjaringan, pemetaan spasial, dan analisis sentimen aspirasi warga 13 Kabupaten dan 1 Kota di Kalimantan Tengah. Inisiator & Pengembang: Evan." />
-    <meta property="og:title" content="CivicPulse Kalteng - Inisiator & Pengembang: Evan" />
+    <meta property="og:title" content="CityPulse Kalteng - Aspirasi Warga" />
     <meta property="og:description" content="Platform penjaringan, pemetaan spasial, dan analisis sentimen aspirasi warga 13 Kabupaten dan 1 Kota di Kalimantan Tengah. Inisiator & Pengembang: Evan." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('citypulse_theme');
+          if (saved === 'light') {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+            document.documentElement.setAttribute('data-theme', 'light');
+          } else {
+            // Default to dark mode when not set or set to 'dark'
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

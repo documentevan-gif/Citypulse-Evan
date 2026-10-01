@@ -267,6 +267,7 @@ export const RegionDrillDownModal: React.FC<RegionDrillDownModalProps> = ({
               <option value="All">Semua Kategori Isu</option>
               <option value="Transportasi">Transportasi</option>
               <option value="Drainase & Banjir">Drainase & Banjir</option>
+              <option value="Bencana Alam">Mitigasi Bencana Alam & Karhutla</option>
               <option value="Sampah">Pengelolaan Sampah</option>
               <option value="Air Bersih & Sanitasi">Air Bersih & Sanitasi</option>
               <option value="Ruang Terbuka Hijau">Ruang Terbuka Hijau</option>

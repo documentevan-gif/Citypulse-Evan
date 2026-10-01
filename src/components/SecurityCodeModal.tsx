@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShieldCheck, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, X, KeyRound } from 'lucide-react';
+import { ShieldCheck, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, X, KeyRound, Printer } from 'lucide-react';
+import { verifyPasscode } from '../services/securityService';
 
-export const AUTH_PASSCODE = 'EvanGantenk6f045';
-
-export type ProtectedActionType = 'import_csv' | 'export_data' | 'clear_data';
+export type ProtectedActionType = 
+  | 'import_csv' 
+  | 'export_data' 
+  | 'clear_data' 
+  | 'open_heuristic'
+  | 'print_pdf';
 
 interface SecurityCodeModalProps {
   isOpen: boolean;
@@ -14,24 +18,41 @@ interface SecurityCodeModalProps {
   pendingFileName?: string | null;
 }
 
-const ACTION_METADATA: Record<ProtectedActionType, { title: string; desc: string; buttonText: string; iconColor: string }> = {
+const ACTION_METADATA: Record<ProtectedActionType, { title: string; desc: string; buttonText: string; iconColor: string; icon: 'shield' | 'printer' }> = {
+  print_pdf: {
+    title: 'Otorisasi Cetak Laporan PDF',
+    desc: 'Mencetak dokumen resmi laporan eksekutif analisis regional, narasi sintesis situasi, dan visualisasi grafik 9 sektor.',
+    buttonText: 'Verifikasi & Cetak PDF',
+    iconColor: 'text-purple-500',
+    icon: 'printer'
+  },
+  open_heuristic: {
+    title: 'Otorisasi Akses Kamus Heuristik',
+    desc: 'Membuka leksikon kata kunci sentimen dan aturan klasifikasi cerdas 9 sektor pembangunan.',
+    buttonText: 'Verifikasi & Buka Kamus',
+    iconColor: 'text-indigo-500',
+    icon: 'shield'
+  },
   import_csv: {
     title: 'Otorisasi Impor Berkas CSV',
     desc: 'Memasukkan dataset aspirasi baru ke dalam basis data sistem.',
     buttonText: 'Verifikasi & Lanjutkan Impor',
-    iconColor: 'text-blue-500'
+    iconColor: 'text-blue-500',
+    icon: 'shield'
   },
   export_data: {
     title: 'Otorisasi Ekspor Data Aspirasi',
     desc: 'Mengunduh dan mengekstraksi seluruh arsip data aspirasi warga.',
     buttonText: 'Verifikasi & Unduh Data',
-    iconColor: 'text-emerald-500'
+    iconColor: 'text-emerald-500',
+    icon: 'shield'
   },
   clear_data: {
     title: 'Otorisasi Kosongkan Seluruh Data',
     desc: 'Menghapus seluruh rekaman aspirasi warga untuk reset mode uji coba lapangan.',
     buttonText: 'Verifikasi & Kosongkan Data',
-    iconColor: 'text-rose-500'
+    iconColor: 'text-rose-500',
+    icon: 'shield'
   }
 };
 
@@ -64,7 +85,7 @@ export const SecurityCodeModal: React.FC<SecurityCodeModalProps> = ({
 
   const metadata = ACTION_METADATA[actionType];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
@@ -76,19 +97,22 @@ export const SecurityCodeModal: React.FC<SecurityCodeModalProps> = ({
 
     setIsVerifying(true);
 
-    // Exact check for the requested passcode
-    if (trimmed === AUTH_PASSCODE) {
-      setTimeout(() => {
+    try {
+      // Cryptographically verified against SHA-256 hash without plaintext leakage
+      const isValid = await verifyPasscode(trimmed);
+      
+      if (isValid) {
         setIsVerifying(false);
         onSuccess();
         onClose();
-      }, 300);
-    } else {
-      setTimeout(() => {
+      } else {
         setIsVerifying(false);
         setErrorMsg('Kode otorisasi salah! Akses ditolak.');
         inputRef.current?.select();
-      }, 300);
+      }
+    } catch (err) {
+      setIsVerifying(false);
+      setErrorMsg('Terjadi kendala pada verifikasi keamanan sistem.');
     }
   };
 
@@ -112,9 +136,15 @@ export const SecurityCodeModal: React.FC<SecurityCodeModalProps> = ({
                 ? 'bg-rose-500/10 border-rose-500/20 text-rose-500'
                 : actionType === 'export_data'
                 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                : actionType === 'print_pdf'
+                ? 'bg-purple-500/10 border-purple-500/20 text-purple-500'
                 : 'bg-blue-500/10 border-blue-500/20 text-blue-500'
             }`}>
-              <ShieldCheck className="w-5 h-5" />
+              {metadata.icon === 'printer' ? (
+                <Printer className="w-5 h-5" />
+              ) : (
+                <ShieldCheck className="w-5 h-5" />
+              )}
             </div>
             <div>
               <div className="text-[10px] font-bold text-blue-500 uppercase tracking-wider flex items-center gap-1.5">
@@ -151,7 +181,7 @@ export const SecurityCodeModal: React.FC<SecurityCodeModalProps> = ({
               </p>
             )}
             <p className="mt-1 text-[11px] text-amber-500/90 font-medium">
-              Fitur ini memerlukan kode otorisasi pengembang/inisiator untuk dapat dijalankan.
+              Fitur ini memerlukan kode otorisasi inisiator untuk menjamin integritas data laporan.
             </p>
           </div>
 
@@ -222,6 +252,8 @@ export const SecurityCodeModal: React.FC<SecurityCodeModalProps> = ({
                   ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-600/25'
                   : actionType === 'export_data'
                   ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/25'
+                  : actionType === 'print_pdf'
+                  ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/25'
                   : 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/25'
               }`}
             >

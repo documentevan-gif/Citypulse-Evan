@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  X, Send, Sparkles, AlertCircle, CheckCircle2, 
-  MapPin, User, FileText, Tag, Loader2
+  X, Send, AlertCircle, CheckCircle2, 
+  MapPin, User, FileText, Tag, Loader2, HelpCircle
 } from 'lucide-react';
 import { KALTENG_REGIONS, KaltengRegion } from '../data/kaltengRegions';
 import { Category, CommentData, Sentiment } from '../types';
@@ -14,11 +14,13 @@ interface AspirationFormModalProps {
   onClose: () => void;
   defaultRegion?: string | null;
   onAspirationSubmitted: (newComment: CommentData) => void;
+  onOpenHeuristicGuide?: () => void;
 }
 
 const CATEGORIES: { label: string; value: Category; desc: string }[] = [
   { label: 'Transportasi & Konektivitas', value: 'Transportasi', desc: 'Jalan arteri, jembatan, angkutan, trotoar, marka jalan' },
   { label: 'Drainase & Pengendalian Banjir', value: 'Drainase & Banjir', desc: 'Saluran air tersumbat, gorong-gorong, sedimentasi parit, genangan' },
+  { label: 'Mitigasi Bencana Alam & Karhutla', value: 'Bencana Alam', desc: 'Karhutla/kebakaran hutan gambut, kabut asap, tanah longsor, banjir DAS, abrasi' },
   { label: 'Pengelolaan Sampah & Kebersihan', value: 'Sampah', desc: 'TPS, TPA, timbulan sampah pasar, armada truk, daur ulang' },
   { label: 'Air Bersih & Sanitasi', value: 'Air Bersih & Sanitasi', desc: 'Jaringan pipa PDAM, suplai air bersih, MCK komunal, limbah' },
   { label: 'Ruang Terbuka Hijau & Ekologi', value: 'Ruang Terbuka Hijau', desc: 'Taman kota, kanopi pohon peneduh, hutan kota, sempadan sungai' },
@@ -32,6 +34,7 @@ export const AspirationFormModal: React.FC<AspirationFormModalProps> = ({
   onClose,
   defaultRegion,
   onAspirationSubmitted,
+  onOpenHeuristicGuide,
 }) => {
   const { isDark } = useTheme();
   const [selectedRegion, setSelectedRegion] = useState<string>('');
@@ -206,19 +209,6 @@ export const AspirationFormModal: React.FC<AspirationFormModalProps> = ({
                   <span className={isDark ? 'text-gray-400 font-medium' : 'text-slate-500 font-medium'}>Kategori Isu:</span>
                   <span className="font-semibold text-blue-500">{successInfo.comment.category}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className={isDark ? 'text-gray-400 font-medium' : 'text-slate-500 font-medium'}>Analisis Sentimen:</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                    successInfo.sentiment === 'Positive' 
-                      ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30'
-                      : successInfo.sentiment === 'Negative'
-                      ? 'bg-rose-500/20 text-rose-500 border border-rose-500/30'
-                      : 'bg-zinc-700/30 text-zinc-400 border border-zinc-600/40'
-                  }`}>
-                    {successInfo.sentiment === 'Positive' ? 'Positif (Apresiasi)' : 
-                     successInfo.sentiment === 'Negative' ? 'Negatif (Keluhan)' : 'Netral (Masukan)'}
-                  </span>
-                </div>
                 <div className={`pt-2 border-t italic ${isDark ? 'border-[#2D313E] text-gray-400' : 'border-slate-200 text-slate-600'}`}>
                   "{successInfo.comment.text}"
                 </div>
@@ -300,10 +290,12 @@ export const AspirationFormModal: React.FC<AspirationFormModalProps> = ({
 
               {/* Kategori Isu */}
               <div>
-                <label className={`block text-xs font-semibold mb-1.5 flex items-center gap-1.5 ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>
-                  <Tag className="w-3.5 h-3.5 text-blue-500" />
-                  <span>Kategori Topik Pembangunan</span>
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className={`text-xs font-semibold flex items-center gap-1.5 ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>
+                    <Tag className="w-3.5 h-3.5 text-blue-500" />
+                    <span>Kategori Topik Pembangunan</span>
+                  </label>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {CATEGORIES.map((cat) => (
                     <button
@@ -342,17 +334,13 @@ export const AspirationFormModal: React.FC<AspirationFormModalProps> = ({
                   rows={4}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Ceritakan kondisi nyata yang Anda rasakan di lapangan. Misalnya: kondisi jalan berlubang di jalan utama, perlunya penambahan armada sampah pasar, atau apresiasi atas taman kota yang rapi..."
+                  placeholder="Ceritakan kondisi nyata yang Anda rasakan di lapangan. Misalnya: kondisi jalan berlubang di jalan utama, kebakaran lahan gambut memicu kabut asap, perlunya penambahan armada sampah pasar, atau apresiasi atas taman kota yang rapi..."
                   className={`w-full border rounded-xl p-3 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none leading-relaxed ${
                     isDark ? 'bg-[#12141B] border-[#2D313E] text-white placeholder:text-gray-500' : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 shadow-2xs'
                   }`}
                 />
                 <div className={`flex items-center justify-between text-[11px] mt-1 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
                   <span>Minimal {minChars} karakter</span>
-                  <span className="flex items-center gap-1 text-blue-500">
-                    <Sparkles className="w-3 h-3" />
-                    Analisis sentimen otomatis
-                  </span>
                 </div>
               </div>
 

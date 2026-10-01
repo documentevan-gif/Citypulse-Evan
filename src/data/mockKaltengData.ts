@@ -28,6 +28,14 @@ export function generateKaltengMockData(): CommentData[] {
       'Kawasan bantaran sungai di {wilayah} membutuhkan tanggul penahan banjir rob dan sistem pompa air otomatis saat debit air sungai naik.',
       'Pembangunan saluran drainase beton baru di kompleks perumahan {wilayah} sangat rapi dan efektif mengatasi genangan menahun.'
     ],
+    'Bencana Alam': [
+      'Titik panas (hotspot) dan kebakaran lahan gambut di pinggiran {wilayah} mulai memicu kabut asap, mohon patroli Manggala Agni dan Masyarakat Peduli Api (MPA) diintensifkan.',
+      'Apresiasi kesigapan tim BPBD dan relawan Masyarakat Peduli Api (MPA) di {wilayah} yang bergerak cepat memadamkan kebakaran semak belukar sebelum merembet ke permukiman.',
+      'Kawasan tebing perbukitan di jalur poros penghubung {wilayah} rawan longsor saat musim hujan lebat, perlu segera dipasang bronjong kawat penahan tanah.',
+      'Debit air sungai utama di {wilayah} meluap tinggi setelah hujan lebat di hulu, masyarakat bantaran sungai membutuhkan bantuan tenda darurat dan logistik makanan.',
+      'Warga mengusulkan percepatan revitalisasi sekat kanal (canal blocking) di area lahan gambut terdegradasi {wilayah} untuk menjaga kelembapan tanah dan mencegah karhutla.',
+      'Gelombang pasang dan abrasi pantai di kawasan pesisir {wilayah} mengancam pondasi rumah nelayan, butuh penanaman sabuk mangrove dan pemecah ombak.'
+    ],
     Sampah: [
       'Tempat Penampungan Sementara (TPS) liar di dekat pasar tradisional {wilayah} meluap dan mencemari saluran drainase warga.',
       'Program edukasi bank sampah dan daur ulang sampah organik di {wilayah} mulai menunjukkan dampak positif bagi kebersihan kelurahan.',
@@ -95,6 +103,7 @@ export function generateKaltengMockData(): CommentData[] {
   const categories: Category[] = [
     'Transportasi', 
     'Drainase & Banjir', 
+    'Bencana Alam',
     'Sampah', 
     'Air Bersih & Sanitasi', 
     'Ruang Terbuka Hijau', 
@@ -112,9 +121,10 @@ export function generateKaltengMockData(): CommentData[] {
       // Probabilistic category picking based on realistic urban concerns
       const randCat = Math.random();
       let cat: Category = 'Transportasi';
-      if (randCat < 0.28) cat = 'Transportasi';
-      else if (randCat < 0.46) cat = 'Drainase & Banjir';
-      else if (randCat < 0.62) cat = 'Sampah';
+      if (randCat < 0.24) cat = 'Transportasi';
+      else if (randCat < 0.38) cat = 'Drainase & Banjir';
+      else if (randCat < 0.50) cat = 'Bencana Alam';
+      else if (randCat < 0.63) cat = 'Sampah';
       else if (randCat < 0.74) cat = 'Air Bersih & Sanitasi';
       else if (randCat < 0.83) cat = 'Ruang Terbuka Hijau';
       else if (randCat < 0.90) cat = 'Tata Ruang & Pemukiman';
@@ -125,7 +135,7 @@ export function generateKaltengMockData(): CommentData[] {
       let sent: Sentiment = 'Neutral';
 
       // Realistic sentiment weight per category
-      if (cat === 'Drainase & Banjir' || cat === 'Transportasi' || cat === 'Air Bersih & Sanitasi') {
+      if (cat === 'Drainase & Banjir' || cat === 'Transportasi' || cat === 'Air Bersih & Sanitasi' || cat === 'Bencana Alam') {
         sent = randSent < 0.18 ? 'Positive' : randSent < 0.76 ? 'Negative' : 'Neutral';
       } else if (cat === 'Sampah' || cat === 'Tata Ruang & Pemukiman') {
         sent = randSent < 0.22 ? 'Positive' : randSent < 0.72 ? 'Negative' : 'Neutral';

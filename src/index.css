@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
   --bg: #0B0E14;
@@ -52,6 +51,34 @@ body {
 
 .animate-scale-up {
   animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Corridor & Agent-Based Flow Animations */
+@keyframes flowDash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+@keyframes reverseFlowDash {
+  to {
+    stroke-dashoffset: 24;
+  }
+}
+
+.animate-corridor-flow {
+  animation: flowDash 1.4s linear infinite;
+}
+
+.animate-corridor-flow-reverse {
+  animation: reverseFlowDash 1.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-corridor-flow,
+  .animate-corridor-flow-reverse {
+    animation: none;
+  }
 }
 
 /* Custom scrollbar */

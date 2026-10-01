@@ -1,5 +1,12 @@
 import { CommentData } from '../types';
 import { generateKaltengMockData } from '../data/mockKaltengData';
+import { 
+  saveAspirationToCloud, 
+  batchSaveAspirationsToCloud, 
+  deleteAspirationFromCloud,
+  batchDeleteAspirationsFromCloud,
+  clearAllAspirationsFromCloud 
+} from './firebase';
 
 const LIVE_STORAGE_KEY = 'citypulse_kalteng_live_data_v1';
 const LEGACY_KEYS = [
@@ -49,12 +56,52 @@ export function saveComments(comments: CommentData[]): void {
 }
 
 /**
- * Appends a new citizen aspiration and persists to storage.
+ * Appends a new citizen aspiration and persists to storage and Cloud Firestore.
  */
 export function saveNewComment(comment: CommentData): CommentData[] {
   const current = loadStoredComments();
   const updated = [comment, ...current];
   saveComments(updated);
+  
+  // Asynchronously sync to Cloud Firestore
+  saveAspirationToCloud(comment).catch((err) => {
+    console.warn('Background sync aspiration to cloud failed:', err);
+  });
+
+  return updated;
+}
+
+/**
+ * Deletes a single aspiration by ID and syncs to Cloud Firestore.
+ */
+export function deleteStoredComment(id: string): CommentData[] {
+  const current = loadStoredComments();
+  const updated = current.filter(item => item.id !== id);
+  saveComments(updated);
+
+  // Asynchronously sync deletion to Cloud Firestore
+  deleteAspirationFromCloud(id).catch((err) => {
+    console.warn('Background sync delete aspiration from cloud failed:', err);
+  });
+
+  return updated;
+}
+
+/**
+ * Deletes multiple selected aspirations by IDs and syncs to Cloud Firestore.
+ */
+export function deleteSelectedStoredComments(ids: string[]): CommentData[] {
+  if (ids.length === 0) return loadStoredComments();
+  const idSet = new Set(ids);
+  const current = loadStoredComments();
+  const updated = current.filter(item => !idSet.has(item.id));
+  saveComments(updated);
+
+  // Asynchronously sync batch deletion to Cloud Firestore
+  batchDeleteAspirationsFromCloud(ids).catch((err) => {
+    console.warn('Background sync batch delete from cloud failed:', err);
+  });
+
   return updated;
 }
 
@@ -68,6 +115,12 @@ export function clearAllStoredComments(): CommentData[] {
   } catch (e) {
     console.warn('Gagal mengosongkan data penyimpanan:', e);
   }
+
+  // Asynchronously clear Cloud Firestore
+  clearAllAspirationsFromCloud().catch((err) => {
+    console.warn('Background clear cloud database failed:', err);
+  });
+
   return [];
 }
 
@@ -77,6 +130,9 @@ export function clearAllStoredComments(): CommentData[] {
 export function loadDemoSampleData(): CommentData[] {
   const demoData = generateKaltengMockData();
   saveComments(demoData);
+  batchSaveAspirationsToCloud(demoData).catch((err) => {
+    console.warn('Background batch sync demo data failed:', err);
+  });
   return demoData;
 }
 
@@ -86,3 +142,4 @@ export function loadDemoSampleData(): CommentData[] {
 export function resetStoredComments(): CommentData[] {
   return clearAllStoredComments();
 }
+

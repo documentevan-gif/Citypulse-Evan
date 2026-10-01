@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny all paths unless explicitly permitted
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidAspiration(data) {
+      return data.keys().hasAll(['id', 'author', 'createdAt', 'text', 'region', 'category', 'sentiment'])
+        && data.keys().hasOnly(['id', 'author', 'createdAt', 'text', 'region', 'category', 'sentiment', 'processed', 'verified'])
+        && data.id is string && data.id.size() <= 128
+        && data.author is string && data.author.size() <= 100
+        && data.createdAt is string && data.createdAt.size() <= 50
+        && data.text is string && data.text.size() > 0 && data.text.size() <= 3000
+        && data.region is string && data.region.size() <= 100
+        && data.category is string && data.category.size() <= 100
+        && data.sentiment is string && data.sentiment in ['Positive', 'Negative', 'Neutral'];
+    }
+
+    // Citizen aspirations collection (central database)
+    match /aspirations/{aspirationId} {
+      // Anyone can read aspirations to power the public spatial dashboard
+      allow read: if true;
+      // Citizens can submit new aspirations
+      allow create: if isValidId(aspirationId) && isValidAspiration(request.resource.data);
+      // Allow updates if valid
+      allow update: if isValidId(aspirationId) && isValidAspiration(request.resource.data);
+      // Allow deletion for admin data management
+      allow delete: if isValidId(aspirationId);
+    }
+
+    // Connection testing endpoint
+    match /test/{testId} {
+      allow read, write: if true;
+    }
+  }
+}

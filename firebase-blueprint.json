@@ -1,0 +1,62 @@
+{
+  "entities": {
+    "Aspiration": {
+      "title": "Aspiration",
+      "description": "Citizen aspiration and spatial sentiment record for Central Kalimantan regional planning",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the aspiration record"
+        },
+        "author": {
+          "type": "string",
+          "description": "Name or pseudonym of the citizen submitting the aspiration"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of when the aspiration was created"
+        },
+        "text": {
+          "type": "string",
+          "description": "Full text of the aspiration or problem description"
+        },
+        "region": {
+          "type": "string",
+          "description": "Regency or City in Central Kalimantan"
+        },
+        "category": {
+          "type": "string",
+          "description": "Public infrastructure or regional issue category"
+        },
+        "sentiment": {
+          "type": "string",
+          "description": "Classified sentiment: Positive, Negative, or Neutral"
+        },
+        "processed": {
+          "type": "boolean",
+          "description": "Whether the record has undergone spatial & NLP processing"
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Verification status flag"
+        }
+      },
+      "required": [
+        "id",
+        "author",
+        "createdAt",
+        "text",
+        "region",
+        "category",
+        "sentiment"
+      ]
+    }
+  },
+  "firestore": {
+    "/aspirations/{aspirationId}": {
+      "schema": "Aspiration",
+      "description": "Central collection of citizen aspirations across all 13 regencies and 1 city in Central Kalimantan"
+    }
+  }
+}

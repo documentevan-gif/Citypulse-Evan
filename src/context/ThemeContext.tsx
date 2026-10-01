@@ -15,8 +15,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('citypulse_theme') as Theme;
-      if (saved === 'light' || saved === 'dark') return saved;
-      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      // If user previously explicitly picked light or dark, respect it
+      if (saved === 'light' || saved === 'dark') {
+        return saved;
+      }
+      // Rule: Saat localStorage belum memiliki data tema ('citypulse_theme'), paksa state default ke 'dark'
+      return 'dark';
     }
     return 'dark';
   });

@@ -37,9 +37,12 @@ export const AiWeeklyInsightCard: React.FC<AiWeeklyInsightCardProps> = ({
     }
   };
 
+  // Generate deterministic dataset fingerprint
+  const commentsSignature = `${comments.length}_${comments[0]?.id || ''}_${comments[comments.length - 1]?.id || ''}`;
+
   useEffect(() => {
     loadInsight(timeframeDays);
-  }, [timeframeDays, comments.length]);
+  }, [timeframeDays, commentsSignature]);
 
   const handleCopySummary = () => {
     if (!insight) return;
@@ -72,7 +75,7 @@ ${insight.policyRecommendations.map(r => `• [${r.targetAgency}] (${r.priority}
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
               <Sparkles className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
-              <span>Insight Otomatis AI • Gemini 3.8 Flash</span>
+              <span>Smart Insight • Evan </span>
             </span>
             <span className="text-[11px] text-gray-400 flex items-center gap-1">
               <Clock className="w-3 h-3 text-gray-500" />
